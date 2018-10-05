@@ -8,7 +8,7 @@ from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 
 import visionocr
 import os
-from CREDENTIALS import BOT_KEY #, USER_DATA
+from CREDENTIALS import BOT_KEY, CHECK_REGEX #, USER_DATA
 CONFIG = 'user_data.json'
 
 import logging
@@ -151,21 +151,14 @@ def parse_ocr(bot,chat_id,ocr_text,user_data):
     user_data['order_id'] = date + ' ' + time + ' ' + check 
                            #user_data['customer'] + ' ' + date
     user_data['currency_amount'] = amount
-    #i = 0
-    #desc = ''
-    #for line in ocr_text.splitlines() :
-    #    i += 1
-    #    if line == 'Всего:':
-    #        break
-    #    if i > 12 and re.search(r'\D+', line):
-    #        desc += line + ' '
+
     try:
         user_data['description'] = re.search(r'(Блюдо\nКол-во\nСумма\n)(.*\n)(Всего:\n)' , ocr_text, flags=re.DOTALL ).group(2)
     except Exception as e:
         logger.warning(e)
         user_data['description'] = 'Error'
     
-    logger.warning(str(user_data))
+    logger.info(str(user_data))
     #
     bot.send_message(chat_id=chat_id, text='Here you go:\n\n' + str(user_data))
     db.add(user_data)

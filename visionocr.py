@@ -1,6 +1,6 @@
 import io
 from google.oauth2 import service_account
-from google.cloud import vision
+	
 from CREDENTIALS import VISION_KEY_PATH
 
 credentials = service_account.Credentials.from_service_account_file(
@@ -12,7 +12,11 @@ def read_image(filepath):
     with io.open(filepath, 'rb') as image_file:
         content = image_file.read()
     image = vision.types.Image(content=content)
-    response = client.document_text_detection(image=image)
+	# Language hint codes for handwritten OCR:
+    # en-t-i0-handwrit, mul-Latn-t-i0-handwrit
+    # Note: Use only one language hint code per request for handwritten OCR.
+    image_context = vision.types.ImageContext(language_hints=['ru'])
+    response = client.document_text_detection(image=image, image_context=image_context)
     document = response.full_text_annotation.text
     
     if document == '':
